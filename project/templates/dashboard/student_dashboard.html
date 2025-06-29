@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - EduTutor AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-brain me-2"></i>EduTutor AI
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ user.name }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('quiz') }}">
+                            <i class="fas fa-brain me-2"></i>Take Quiz
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('history') }}">
+                            <i class="fas fa-chart-line me-2"></i>Quiz History
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('profile') }}">
+                            <i class="fas fa-user-cog me-2"></i>Profile
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Welcome Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-gradient-primary text-white">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h1 class="mb-2">Welcome back, {{ user.name }}! 🎓</h1>
+                                <p class="mb-0 opacity-75">Ready to continue your AI-powered learning journey?</p>
+                            </div>
+                            <div class="col-auto d-none d-md-block">
+                                <i class="fas fa-graduation-cap fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Quizzes</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-quizzes">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Average Score</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="avg-score">0%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Best Score</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="best-score">0%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-star fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Learning Streak</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="streak">0 days</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-fire fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Row -->
+        <div class="row">
+            <!-- Quick Actions -->
+            <div class="col-lg-8 mb-4">
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-rocket me-2"></i>Quick Actions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <a href="{{ url_for('quiz') }}" class="btn btn-primary btn-lg w-100 action-btn">
+                                    <i class="fas fa-brain fa-2x mb-2"></i>
+                                    <div>Take AI Quiz</div>
+                                    <small>Generate personalized quizzes with IBM Granite AI</small>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{{ url_for('history') }}" class="btn btn-success btn-lg w-100 action-btn">
+                                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                    <div>View Progress</div>
+                                    <small>Track your learning analytics and performance</small>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="http://localhost:7860" target="_blank" class="btn btn-info btn-lg w-100 action-btn">
+                                    <i class="fas fa-robot fa-2x mb-2"></i>
+                                    <div>AI Assistant</div>
+                                    <small>Get help from your AI learning companion</small>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-warning btn-lg w-100 action-btn" onclick="loadRecommendations()">
+                                    <i class="fas fa-lightbulb fa-2x mb-2"></i>
+                                    <div>Get Recommendations</div>
+                                    <small>AI-powered learning suggestions</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="card shadow mt-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-chart-area me-2"></i>Performance Trend
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="performanceChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- AI Recommendations -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-lightbulb me-2"></i>AI Recommendations
+                        </h6>
+                    </div>
+                    <div class="card-body" id="recommendations-panel">
+                        <div class="text-center text-muted">
+                            <i class="fas fa-robot fa-3x mb-3"></i>
+                            <p>Click "Get Recommendations" to see your personalized learning suggestions!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-history me-2"></i>Recent Activity
+                        </h6>
+                    </div>
+                    <div class="card-body" id="recent-activity">
+                        <div class="text-center text-muted">
+                            <i class="fas fa-clock fa-2x mb-3"></i>
+                            <p>No recent activity. Take your first quiz!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnostic Test Alert -->
+        {% if not user.diagnostic_completed %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Complete Your Diagnostic Assessment
+                    </h5>
+                    <p class="mb-3">Take our AI-powered diagnostic test to get personalized learning recommendations and adaptive quiz difficulty!</p>
+                    <a href="http://localhost:7860" target="_blank" class="btn btn-warning me-2">
+                        <i class="fas fa-clipboard-check me-2"></i>Take Diagnostic Test
+                    </a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let performanceChart = null;
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/quiz_history/{{ user.id }}');
+                const attempts = await response.json();
+                
+                updateStats(attempts);
+                updateRecentActivity(attempts);
+                createPerformanceChart(attempts);
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        function updateStats(attempts) {
+            const totalQuizzes = attempts.length;
+            document.getElementById('total-quizzes').textContent = totalQuizzes;
+            
+            if (totalQuizzes > 0) {
+                const scores = attempts.map(attempt => attempt.score);
+                const avgScore = scores.reduce((sum, score) => sum + score, 0) / totalQuizzes;
+                const bestScore = Math.max(...scores);
+                
+                document.getElementById('avg-score').textContent = Math.round(avgScore) + '%';
+                document.getElementById('best-score').textContent = bestScore + '%';
+                
+                // Calculate streak (mock for now)
+                document.getElementById('streak').textContent = Math.min(totalQuizzes, 7) + ' days';
+            }
+        }
+
+        function updateRecentActivity(attempts) {
+            const recentPanel = document.getElementById('recent-activity');
+            
+            if (attempts.length === 0) {
+                return;
+            }
+            
+            const recentAttempts = attempts.slice(-3).reverse();
+            let html = '';
+            
+            recentAttempts.forEach(attempt => {
+                const date = new Date(attempt.completed_at).toLocaleDateString();
+                const scoreClass = attempt.score >= 80 ? 'success' : attempt.score >= 60 ? 'warning' : 'danger';
+                
+                html += `
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="fw-bold">Quiz Completed</div>
+                            <small class="text-muted">${date}</small>
+                        </div>
+                        <span class="badge bg-${scoreClass}">${attempt.score}%</span>
+                    </div>
+                `;
+            });
+            
+            recentPanel.innerHTML = html;
+        }
+
+        function createPerformanceChart(attempts) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+            
+            if (attempts.length === 0) {
+                ctx.fillText('No data available', 200, 100);
+                return;
+            }
+            
+            const labels = attempts.slice(-10).map(attempt => 
+                new Date(attempt.completed_at).toLocaleDateString()
+            );
+            const scores = attempts.slice(-10).map(attempt => attempt.score);
+            
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Quiz Score',
+                        data: scores,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Your Learning Progress'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadRecommendations() {
+            const panel = document.getElementById('recommendations-panel');
+            panel.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i><p class="mt-2">Loading AI recommendations...</p></div>';
+            
+            try {
+                const response = await fetch('/api/recommendations/{{ user.id }}');
+                const data = await response.json();
+                
+                let html = '<h6 class="text-primary mb-3"><i class="fas fa-robot me-2"></i>AI Recommendations</h6>';
+                
+                if (data.recommended_topics && data.recommended_topics.length > 0) {
+                    html += '<div class="mb-3"><strong>Recommended Topics:</strong><ul class="list-unstyled mt-2">';
+                    data.recommended_topics.forEach(topic => {
+                        html += `<li><i class="fas fa-arrow-right text-primary me-2"></i>${topic}</li>`;
+                    });
+                    html += '</ul></div>';
+                }
+                
+                if (data.recommended_difficulty) {
+                    html += `<div class="mb-3"><strong>Recommended Difficulty:</strong> <span class="badge bg-info">${data.recommended_difficulty}</span></div>`;
+                }
+                
+                if (data.next_steps) {
+                    html += `<div class="alert alert-light"><strong>Next Steps:</strong><br>${data.next_steps}</div>`;
+                }
+                
+                panel.innerHTML = html;
+            } catch (error) {
+                panel.innerHTML = '<div class="alert alert-danger">Error loading recommendations. Please try again.</div>';
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+    </script>
+</body>
+</html>

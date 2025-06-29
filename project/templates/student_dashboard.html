@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - EduTutor AI{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Welcome Header -->
+    <div class="col-12">
+        <div class="card bg-gradient-primary text-white mb-4">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="mb-2">Welcome back, {{ user.name }}!</h1>
+                        <p class="mb-0 opacity-75">Ready to continue your learning journey?</p>
+                    </div>
+                    <div class="col-auto d-none d-md-block">
+                        <i class="fas fa-graduation-cap fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="col-md-3 mb-4">
+        <div class="card border-left-primary">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Quizzes</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-quizzes">12</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card border-left-success">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Average Score</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="avg-score">85%</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card border-left-warning">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Time Spent</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="time-spent">240m</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card border-left-info">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Current Streak</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="streak">5 days</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-fire fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-rocket me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('quiz') }}" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-brain me-2"></i>Take New Quiz
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('history') }}" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-chart-line me-2"></i>View Progress
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="http://localhost:7860" target="_blank" class="btn btn-info btn-lg w-100">
+                            <i class="fas fa-robot me-2"></i>AI Assistant
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-warning btn-lg w-100" onclick="loadRecommendations()">
+                            <i class="fas fa-lightbulb me-2"></i>Get Recommendations
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnostic Test Alert -->
+        {% if not user.diagnostic_completed %}
+        <div class="alert alert-warning mt-3" role="alert">
+            <h5 class="alert-heading">
+                <i class="fas fa-exclamation-triangle me-2"></i>Complete Your Assessment
+            </h5>
+            <p>Take our diagnostic test to get personalized learning recommendations!</p>
+            <a href="http://localhost:7860" target="_blank" class="btn btn-warning">
+                <i class="fas fa-clipboard-check me-2"></i>Take Diagnostic Test
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recommendations Panel -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>AI Recommendations
+                </h5>
+            </div>
+            <div class="card-body" id="recommendations-panel">
+                <div class="text-center text-muted">
+                    <i class="fas fa-robot fa-3x mb-3"></i>
+                    <p>Click "Get Recommendations" to see your personalized learning suggestions!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Recent Quiz Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="recent-quizzes">
+                        <thead>
+                            <tr>
+                                <th>Topic</th>
+                                <th>Difficulty</th>
+                                <th>Score</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mathematics</td>
+                                <td><span class="badge bg-warning">Medium</span></td>
+                                <td><span class="badge bg-success">92%</span></td>
+                                <td>2024-01-15</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Completed</td>
+                            </tr>
+                            <tr>
+                                <td>Physics</td>
+                                <td><span class="badge bg-danger">Hard</span></td>
+                                <td><span class="badge bg-warning">78%</span></td>
+                                <td>2024-01-14</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Completed</td>
+                            </tr>
+                            <tr>
+                                <td>Chemistry</td>
+                                <td><span class="badge bg-success">Easy</span></td>
+                                <td><span class="badge bg-success">88%</span></td>
+                                <td>2024-01-13</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Completed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Learning Goals Modal -->
+<div class="modal fade" id="goalsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-target me-2"></i>Learning Goals
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Mathematics Mastery</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-primary" style="width: 75%"></div>
+                    </div>
+                    <small class="text-muted">75% Complete</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Physics Fundamentals</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" style="width: 60%"></div>
+                    </div>
+                    <small class="text-muted">60% Complete</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Chemistry Basics</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-warning" style="width: 45%"></div>
+                    </div>
+                    <small class="text-muted">45% Complete</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Update Goals</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadRecommendations() {
+    const panel = document.getElementById('recommendations-panel');
+    panel.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i><p class="mt-2">Loading recommendations...</p></div>';
+    
+    try {
+        const response = await fetch('/api/recommendations/{{ user.id }}');
+        const data = await response.json();
+        
+        let html = '<h6 class="text-primary">Personalized Recommendations</h6>';
+        
+        if (data.recommended_topics && data.recommended_topics.length > 0) {
+            html += '<div class="mb-3"><strong>Recommended Topics:</strong><ul class="list-unstyled mt-2">';
+            data.recommended_topics.forEach(topic => {
+                html += `<li><i class="fas fa-arrow-right text-primary me-2"></i>${topic}</li>`;
+            });
+            html += '</ul></div>';
+        }
+        
+        if (data.recommended_difficulty) {
+            html += `<div class="mb-3"><strong>Recommended Difficulty:</strong> <span class="badge bg-info">${data.recommended_difficulty}</span></div>`;
+        }
+        
+        if (data.next_steps) {
+            html += `<div class="alert alert-light"><strong>Next Steps:</strong><br>${data.next_steps}</div>`;
+        }
+        
+        panel.innerHTML = html;
+    } catch (error) {
+        panel.innerHTML = '<div class="alert alert-danger">Error loading recommendations. Please try again.</div>';
+    }
+}
+
+// Load quiz history
+async function loadQuizHistory() {
+    try {
+        const response = await fetch('/api/quiz_history/{{ user.id }}');
+        const attempts = await response.json();
+        
+        // Update stats
+        document.getElementById('total-quizzes').textContent = attempts.length;
+        
+        if (attempts.length > 0) {
+            const avgScore = attempts.reduce((sum, attempt) => sum + attempt.score, 0) / attempts.length;
+            document.getElementById('avg-score').textContent = Math.round(avgScore) + '%';
+        }
+    } catch (error) {
+        console.error('Error loading quiz history:', error);
+    }
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadQuizHistory();
+});
+</script>
+{% endblock %}

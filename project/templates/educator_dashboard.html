@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}Educator Dashboard - EduTutor AI{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Welcome Header -->
+    <div class="col-12">
+        <div class="card bg-gradient-primary text-white mb-4">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="mb-2">Educator Dashboard</h1>
+                        <p class="mb-0 opacity-75">Welcome, {{ user.name }}! Monitor your students' progress and performance.</p>
+                    </div>
+                    <div class="col-auto d-none d-md-block">
+                        <i class="fas fa-chalkboard-teacher fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Students</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">45</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Today</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">32</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Average Score</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">78%</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-bar fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Completion Rate</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">85%</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-area me-2"></i>Student Performance Overview
+                </h6>
+            </div>
+            <div class="card-body">
+                <canvas id="performanceChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-trophy me-2"></i>Top Performers
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-medal text-warning me-2"></i>
+                            <strong>Alice Johnson</strong>
+                            <br><small class="text-muted">15 quizzes completed</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">94%</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-medal text-secondary me-2"></i>
+                            <strong>David Wilson</strong>
+                            <br><small class="text-muted">12 quizzes completed</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">92%</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-medal text-warning me-2"></i>
+                            <strong>Emma Brown</strong>
+                            <br><small class="text-muted">18 quizzes completed</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">89%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-clock me-2"></i>Recent Student Activity
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Quiz</th>
+                                <th>Score</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center me-3">
+                                            <span class="text-white font-weight-bold">AJ</span>
+                                        </div>
+                                        Alice Johnson
+                                    </div>
+                                </td>
+                                <td>Algebra Basics</td>
+                                <td><span class="badge bg-success">92%</span></td>
+                                <td>2 hours ago</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Completed</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-info rounded-circle d-flex align-items-center justify-content-center me-3">
+                                            <span class="text-white font-weight-bold">BS</span>
+                                        </div>
+                                        Bob Smith
+                                    </div>
+                                </td>
+                                <td>Physics Laws</td>
+                                <td><span class="badge bg-warning">78%</span></td>
+                                <td>3 hours ago</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Completed</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-success rounded-circle d-flex align-items-center justify-content-center me-3">
+                                            <span class="text-white font-weight-bold">CD</span>
+                                        </div>
+                                        Carol Davis
+                                    </div>
+                                </td>
+                                <td>Chemistry Elements</td>
+                                <td><span class="badge bg-success">88%</span></td>
+                                <td>5 hours ago</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Completed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-tools me-2"></i>Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <a href="http://localhost:7860" target="_blank" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-robot me-2"></i>AI Analytics
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-success btn-lg w-100" onclick="syncClassroom()">
+                            <i class="fab fa-google me-2"></i>Sync Classroom
+                        </button>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-info btn-lg w-100" onclick="generateReport()">
+                            <i class="fas fa-file-export me-2"></i>Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Performance Chart
+const ctx = document.getElementById('performanceChart').getContext('2d');
+const performanceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+            label: 'Average Score',
+            data: [65, 70, 75, 78, 82, 85],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }, {
+            label: 'Completion Rate',
+            data: [70, 75, 80, 82, 85, 88],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Student Performance Trends'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    }
+});
+
+async function syncClassroom() {
+    try {
+        const response = await fetch('/api/sync_classroom', { method: 'POST' });
+        const data = await response.json();
+        alert('Classroom sync completed successfully!');
+    } catch (error) {
+        alert('Error syncing classroom: ' + error.message);
+    }
+}
+
+function generateReport() {
+    // Mock report generation
+    alert('Report generation started! You will receive an email when it\'s ready.');
+}
+</script>
+{% endblock %}
